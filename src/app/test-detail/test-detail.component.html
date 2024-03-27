@@ -1,0 +1,194 @@
+<mat-divider class="mb-4 bg-gray"></mat-divider>
+
+@if (!loading() && timeSheetData()) {
+  <form [formGroup]="timeSheetForm">
+    <div class="d-flex justify-content-between">
+      <span
+        class="short-header text-center fs-7 fw-semibold"
+        style="width: 200px"
+      >
+        START</span
+      ><span
+        class="short-header text-center fs-7 fw-semibold"
+        style="width: 200px"
+        >END OF </span
+      ><span class="fs-7 fw-semibold" style="width: 90px">BREAK TIME</span
+      ><span class="fs-7 fw-semibold" style="width: 90px">TOTAL TIME</span
+      ><span class="fs-7 fw-semibold" style="width: 90px">AMOUNT</span>
+      <span style="width: 30px"></span>
+    </div>
+    @for (
+      sheet of timeSheetData()?.TimeSheetItems;
+      track sheet;
+      let i = $index
+    ) {
+      <div
+        class="d-flex justify-content-between mt-2"
+        [ngClass]="{ 'mb-2': !errorRows().includes(i) }"
+      >
+        <div
+          class="d-flex justify-content-between fw-bold"
+          style="width: 200px"
+        >
+          {{ sheet.ItemStartDate | date: "dd.MM.yyyy" }}
+          {{ !editRows().includes(i) ? " / " : "" }}
+          @if (!editRows().includes(i)) {
+            {{ sheet.ItemStartTime }}
+          } @else {
+            <div formArrayName="startTime">
+              <input
+                type="time"
+                class="form-control"
+                id="startTime"
+                height="28px"
+                [formControlName]="i"
+                required
+              />
+            </div>
+          }
+        </div>
+        <div
+          class="d-flex justify-content-between fw-bold"
+          style="width: 200px"
+        >
+          {{ sheet.ItemEndDate | date: "dd.MM.yyyy" }}
+          {{ !editRows().includes(i) ? " / " : "" }}
+
+          @if (!editRows().includes(i)) {
+            {{ sheet.ItemEndTime }}
+          } @else {
+            <div formArrayName="endTime">
+              <input
+                type="time"
+                class="form-control"
+                id="ItemEndTime"
+                [formControlName]="i"
+                required
+              />
+            </div>
+          }
+        </div>
+        <div class="d-flex justify-content-center fw-bold" style="width: 90px">
+          @if (!editRows().includes(i)) {
+            {{ sheet.ItemBreakTimeMinute }}
+          } @else {
+            <div formArrayName="breakTime">
+              <input
+                type="time"
+                class="form-control"
+                id="breakTime"
+                [formControlName]="i"
+                required
+              />
+            </div>
+          }
+        </div>
+        <b style="width: 90px">{{ sheet.ItemTotalTime }}</b>
+        <b style="width: 90px">{{ sheet.ItemTotalWage | currency: "EUR" }}</b>
+        <div
+          class="d-flex align-items-center justify-content-center rounded rounded-circle"
+          [ngClass]="{
+            'bg-primary': !editRows().includes(i),
+            'bg-danger': editRows().includes(i)
+          }"
+          style="width: 30px; height: 30px; cursor: pointer"
+        >
+          @if (!editRows().includes(i)) {
+            <a (click)="onEdit(i)">
+              <mat-icon class="text-white fs-10 mt-1">create</mat-icon>
+            </a>
+          } @else {
+            <a (click)="onRemove(i)">
+              <mat-icon class="text-white fs-10 mt-1">clear</mat-icon>
+            </a>
+          }
+        </div>
+      </div>
+      @if (errorRows().includes(i)) {
+        <span class="text-danger fs-11" style="height: 13px">{{
+          errorMessage(sheet, i)
+        }}</span>
+      }
+    }
+    <mat-divider class="my-3 bg-gray"></mat-divider>
+    <div class="row mb-5">
+      <div class="col-7 d-flex justify-content-center align-items-center">
+        <button
+          type="button"
+          class="btn btn-primary fs-8 py-0 px-3 text-center rounded-5"
+          style="height: 35px"
+        >
+          CACHE INPUT
+        </button>
+      </div>
+      <div class="col-5">
+        <div class="d-flex justify-content-end">
+          <div class="d-flex justify-content-between" style="width: 200px">
+            <span class="fs-9">Total Hours:</span>
+            <span class="text-end fs-5 fw-bold">{{
+              timeSheetData()?.totalWorkHours
+            }}</span>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end">
+          <div class="d-flex justify-content-between" style="width: 200px">
+            <span class="fs-9">Total Amount:</span>
+            <span class="text-end fs-5 fw-bold">{{
+              timeSheetData()?.totalAmount | currency: "EUR"
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-7">
+        <div class="d-flex justify-content-center align-items-center mt-3">
+          <mat-form-field class="w-100" appearance="outline">
+            <textarea
+              style="height: 200px"
+              placeholder="Write a message"
+              cdkTextareaAutosize="false"
+              formControlName="textMessage"
+              (input)="calcLength($event)"
+              maxlength="500"
+              matInput
+            ></textarea>
+          </mat-form-field>
+        </div>
+        <span
+          class="d-flex justify-content-end fs-8 mb-1 me-4"
+          style="margin: -20px"
+          >Max: 500/{{ maxLength() }}</span
+        >
+      </div>
+
+      <div class="col-5 d-flex align-items-end">
+        <div class="grid">
+          <button
+            type="button"
+            class="btn btn-danger fs-9 py-1 px-0 text-center fw-bold mb-2"
+            style="width: 250px"
+            [disabled]="sendButtonDisable()"
+          >
+            SEND ALL ITEMS
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary fs-9 py-1 px-0 text-center fw-bold mb-2"
+            style="width: 250px"
+          >
+            <i class="bi bi-heart-fill text-danger me-1"></i>
+            FAVORITE THIS COMPANY
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+} @else {
+  <div
+    class="d-flex justify-content-center align-items-center w-100"
+    style="height: 250px"
+  >
+    <mat-spinner></mat-spinner>
+  </div>
+}

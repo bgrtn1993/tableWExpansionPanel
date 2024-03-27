@@ -1,0 +1,178 @@
+<div class="container w-100">
+  @if (dataValues()) {
+    <div
+      class="d-flex justify-content-between"
+      style="margin-right: 52px; margin-left: 24px"
+    >
+      @for (
+        header of dataOption?.columnDefs;
+        track header;
+        let index = $index
+      ) {
+        @if (!header.hide) {
+          @if (header.headerType === "search") {
+            <span class="d-flex justify-content-start">
+              {{ header.headerName }}
+              <span
+                class="d-flex justify-content-center align-items-start"
+                style="cursor: pointer"
+              >
+                <button
+                  type="button"
+                  style="background: transparent; border-color: transparent"
+                  [matMenuTriggerFor]="menu"
+                >
+                  <i class="text-primary bi bi-chevron-down fs-5"></i>
+                </button>
+                <mat-menu #menu="matMenu" xPosition="before">
+                  <form
+                    [formGroup]="headersForm"
+                    (click)="stopPropagation($event)"
+                    (submit)="searchTrigger(index)"
+                  >
+                    <div
+                      formArrayName="header"
+                      class="d-flex justify-content-start"
+                    >
+                      <input
+                        type="search"
+                        class="form-control ms-2"
+                        [formControlName]="index"
+                        required
+                      />
+                      <button
+                        type="button"
+                        style="margin-left: 2px; margin-right: 2px"
+                        (click)="searchTrigger(index)"
+                      >
+                        Search
+                      </button>
+                    </div>
+                  </form>
+                </mat-menu></span
+              ></span
+            >
+          } @else if (header.headerType === "sorting") {
+            <a
+              role="button"
+              [style.height]="height"
+              (click)="nextSortState(header.field || '')"
+              [style]="header.headerStyle"
+              [class]="header.headerClass"
+            >
+              {{ header.headerName }}
+              <span
+                class="d-none d-xl-inline-block sort-both"
+                [ngClass]="{
+                  'sort-down':
+                    sortStates[header.field || ''] === sortState.DecreasingSort,
+                  'sort-up':
+                    sortStates[header.field || ''] === sortState.IncreasingSort
+                }"
+              ></span>
+            </a>
+          } @else {
+            <div [class]="header.headerClass" [style]="header.headerStyle">
+              {{ header.headerName }}
+            </div>
+          }
+        }
+      }
+    </div>
+    @if (!loading()) {
+      <mat-accordion #dodoAccordion>
+        @for (data of dataValues(); track data; let i = $index) {
+          <mat-expansion-panel
+            [id]="'dodoPanel' + i"
+            class="row border border-primary bg-white shadow-none rounded my-1 text-center"
+            [hideToggle]="dataOption?.hideToggle || width() <= 1024"
+            [disabled]="dataOption?.alwaysCloseDetail"
+          >
+            <mat-expansion-panel-header #panelH>
+              <mat-panel-description
+                class="text-panel d-flex justify-content-between py-1 w-100"
+              >
+                @for (cell of dataOption?.columnDefs; track cell) {
+                  @if (!cell.hide) {
+                    @if (!cell.html) {
+                      @if (!cell.action) {
+                        <div [class]="cell.cellClass" [style]="cell.cellStyle">
+                          {{ getField(data, cell) }}
+                        </div>
+                      } @else {
+                        <button
+                          class="border border-0"
+                          [class]="cell.cellClass"
+                          [style]="cell.cellStyle"
+                          (click)="panelH._toggle(); actionTrigger(data, cell)"
+                        >
+                          {{ getField(data, cell) }}
+                        </button>
+                      }
+                    } @else {
+                      @if (!cell.action) {
+                        <div [class]="cell.cellClass" [style]="cell.cellStyle">
+                          <div [innerHTML]="getHtml(data, cell)"></div>
+                        </div>
+                      } @else {
+                        <button
+                          mat-icon-button
+                          (click)="actionTrigger(cell)"
+                          [disableRipple]="true"
+                        >
+                          <i [innerHTML]="getHtml(data, cell)"></i>
+                        </button>
+                      }
+                    }
+                  }
+                }
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            @if (!dataOption?.hidePanelDetail) {
+              <ng-template matExpansionPanelContent>
+                <ng-container
+                  *ngComponentOutlet="component; inputs: { data: data }"
+                >
+                </ng-container>
+              </ng-template>
+            }
+          </mat-expansion-panel>
+        } @empty {
+          <div>Es wurden noch keine Stellenanzeigen veröffentlicht.</div>
+        }
+      </mat-accordion>
+    } @else {
+      <div class="w-100" style="padding-inline: 1px">
+        @for (num of arraySkeletonLoader(); track num) {
+          <div
+            class="w-100 my-1 border"
+            shadowSkeleton
+            shadowSkeletonWidth="100%"
+            shadowSkeletonHeight="50px"
+            shadowSkeletonRounding="small"
+          ></div>
+        } @empty {
+          @for (num of "01234567890123456789"; track num) {
+            <div
+              class="W-100 my-1 border"
+              shadowSkeleton
+              shadowSkeletonWidth="100%"
+              shadowSkeletonHeight="50px"
+              shadowSkeletonRounding="small"
+            ></div>
+          }
+        }
+      </div>
+    }
+    <mat-paginator
+      class="bg-transparent"
+      [length]="pageLength"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[10, 20, 50, 100]"
+      [pageIndex]="pageIndex - 1"
+      (page)="pageEvent($event)"
+      aria-label="Select page"
+    >
+    </mat-paginator>
+  }
+</div>

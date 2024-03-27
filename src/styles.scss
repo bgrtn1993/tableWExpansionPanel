@@ -1,0 +1,28 @@
+@use "@angular/material" as mat;
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+@include mat.core();
+$web-client-primary: mat.define-palette(mat.$indigo-palette);
+$web-client-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$web-client-warn: mat.define-palette(mat.$red-palette);
+$web-client-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $web-client-primary,
+      accent: $web-client-accent,
+      warn: $web-client-warn,
+    ),
+  )
+);
+@include mat.all-component-themes($web-client-theme);
+
+/* Importing Bootstrap SCSS file. */
+@import "bootstrap/scss/bootstrap";

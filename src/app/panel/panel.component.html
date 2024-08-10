@@ -97,7 +97,13 @@
                     @if (!cell.html) {
                       @if (!cell.action) {
                         <div [class]="cell.cellClass" [style]="cell.cellStyle">
-                          {{ getField(data, cell) }}
+                          @if (cell.toolTip) {
+                            <div [matTooltip]="getField(data, cell)">
+                              {{ getField(data, cell) }}
+                            </div>
+                          } @else {
+                            {{ getField(data, cell) }}
+                          }
                         </div>
                       } @else {
                         <button
@@ -106,13 +112,26 @@
                           [style]="cell.cellStyle"
                           (click)="panelH._toggle(); actionTrigger(data, cell)"
                         >
-                          {{ getField(data, cell) }}
+                          @if (cell.toolTip) {
+                            <div [matTooltip]="getField(data, cell)">
+                              {{ getField(data, cell) }}
+                            </div>
+                          } @else {
+                            {{ getField(data, cell) }}
+                          }
                         </button>
                       }
                     } @else {
                       @if (!cell.action) {
                         <div [class]="cell.cellClass" [style]="cell.cellStyle">
-                          <div [innerHTML]="getHtml(data, cell)"></div>
+                          @if (cell.toolTip) {
+                            <div
+                              [matTooltip]="getField(data, cell)"
+                              [innerHTML]="getHtml(data, cell)"
+                            ></div>
+                          } @else {
+                            <div [innerHTML]="getHtml(data, cell)"></div>
+                          }
                         </div>
                       } @else {
                         <button
@@ -120,7 +139,14 @@
                           (click)="actionTrigger(cell)"
                           [disableRipple]="true"
                         >
-                          <i [innerHTML]="getHtml(data, cell)"></i>
+                          @if (cell.toolTip) {
+                            <div
+                              [matTooltip]="getField(data, cell)"
+                              [innerHTML]="getHtml(data, cell)"
+                            ></div>
+                          } @else {
+                            <div [innerHTML]="getHtml(data, cell)"></div>
+                          }
                         </button>
                       }
                     }

@@ -28,6 +28,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { NgClass, NgComponentOutlet } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-panel',
@@ -43,6 +44,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatMenuModule,
     ReactiveFormsModule,
     FormsModule,
+    MatTooltip,
   ],
   templateUrl: './panel.component.html',
   styleUrl: './panel.component.scss',

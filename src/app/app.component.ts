@@ -43,6 +43,7 @@ export class AppComponent {
         hide: false,
         field: 'title',
         headerType: 'search',
+        toolTip:true,
         headerAction: (x) => {
           console.log(x);
         },

@@ -18,6 +18,7 @@ export interface columnOption<TData = any> {
   cellStyle?: string;
   headerClass?: string;
   headerStyle?: string;
+  toolTip?:boolean;
   headerType?: 'sorting' | 'dropDown' | 'search' | 'default';
   headerAction?: (
     x: string | number | [key: string] | TData | undefined,
